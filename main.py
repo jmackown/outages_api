@@ -56,13 +56,12 @@ def get_unique_site_devices(site_data):
 
 def filter_outages_by_date(outage_data, start_date="2022-01-01T00:00:00.000Z"):
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-    filtered_outages = []
-    for outage in outage_data:
-        if datetime.strptime(outage["begin"], DATE_FORMAT) >= datetime.strptime(
-            start_date, DATE_FORMAT
-        ):
-            filtered_outages.append(outage)
-    return filtered_outages
+    return [
+        outage
+        for outage in outage_data
+        if datetime.strptime(outage["begin"], DATE_FORMAT)
+        >= datetime.strptime(start_date, DATE_FORMAT)
+    ]
 
 
 def combine_outages_and_site_devices(devices, outage_data):
@@ -78,10 +77,9 @@ def combine_outages_and_site_devices(devices, outage_data):
 
 def generate_post_data(outage_data, device_data):
     filtered = filter_outages_by_date(outage_data=outage_data)
-    combined_data = combine_outages_and_site_devices(
+    return combine_outages_and_site_devices(
         devices=device_data, outage_data=filtered
     )
-    return combined_data
 
 
 def post_data(payload, site_id):
