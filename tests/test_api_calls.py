@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from main import get_outage_data, get_site_info_data
 
 with open("data/outages.json") as f:
@@ -18,13 +20,28 @@ test_site_id = "kingfisher"
 
 def test_get_outage_data(mock_outages_endpoint):
     result = get_outage_data()
-
-    # assert result.status_code == 200
     assert result == test_outages_data
+
+
+@pytest.mark.failed
+def test_get_outage_data_500(mock_outages_endpoint):
+
+    with pytest.raises(Exception) as error:
+        get_outage_data()
+
+    assert str(error.value) == "500"
 
 
 def test_get_site_info_data(mock_site_info_endpoint):
     result = get_site_info_data(site_id=test_site_id)
 
-    # assert result.status_code == 200
     assert result == test_site_info_data
+
+
+@pytest.mark.failed
+def test_get_site_info_data_500(mock_site_info_endpoint):
+
+    with pytest.raises(Exception) as error:
+        get_site_info_data(site_id=test_site_id)
+
+    assert str(error.value) == "500"

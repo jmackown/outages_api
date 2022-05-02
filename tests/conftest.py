@@ -38,39 +38,72 @@ test_site_id = "kingfisher"
 
 
 @pytest.fixture()
-def mock_outages_endpoint():
-    with responses.RequestsMock() as rsps_success:
-        rsps_success.add(
-            responses.GET,
-            f"{os.getenv('BASE_URL')}/outages",
-            body=json.dumps(test_outages_data),
-            status=200,
-            content_type="application/json",
-        )
-        yield rsps_success
+def mock_outages_endpoint(request):
+    if "failed" in request.keywords:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.GET,
+                f"{os.getenv('BASE_URL')}/outages",
+                body=json.dumps({"Error": "Internal Server Error"}),
+                status=500,
+                content_type="application/json",
+            )
+            yield rsps_success
+    else:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.GET,
+                f"{os.getenv('BASE_URL')}/outages",
+                body=json.dumps(test_outages_data),
+                status=200,
+                content_type="application/json",
+            )
+            yield rsps_success
 
 
 @pytest.fixture()
-def mock_outages_endpoint_post():
-    with responses.RequestsMock() as rsps_success:
-        rsps_success.add(
-            responses.POST,
-            f"{os.getenv('BASE_URL')}/site-outages/{test_site_id}",
-            body=json.dumps({}),
-            status=200,
-            content_type="application/json",
-        )
-        yield rsps_success
+def mock_outages_endpoint_post(request):
+    if "failed" in request.keywords:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.POST,
+                f"{os.getenv('BASE_URL')}/site-outages/{test_site_id}",
+                body=json.dumps({"Error": "Unprocessable Entity"}),
+                status=422,
+                content_type="application/json",
+            )
+            yield rsps_success
+    else:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.POST,
+                f"{os.getenv('BASE_URL')}/site-outages/{test_site_id}",
+                body=json.dumps({}),
+                status=200,
+                content_type="application/json",
+            )
+            yield rsps_success
 
 
 @pytest.fixture()
-def mock_site_info_endpoint():
-    with responses.RequestsMock() as rsps_success:
-        rsps_success.add(
-            responses.GET,
-            f"{os.getenv('BASE_URL')}/site-info/{test_site_id}",
-            body=json.dumps(test_site_info_data),
-            status=200,
-            content_type="application/json",
-        )
-        yield rsps_success
+def mock_site_info_endpoint(request):
+    if "failed" in request.keywords:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.GET,
+                f"{os.getenv('BASE_URL')}/site-info/{test_site_id}",
+                body=json.dumps({"Error": "Internal Server Error"}),
+                status=500,
+                content_type="application/json",
+            )
+            yield rsps_success
+    else:
+        with responses.RequestsMock() as rsps_success:
+            rsps_success.add(
+                responses.GET,
+                f"{os.getenv('BASE_URL')}/site-info/{test_site_id}",
+                body=json.dumps(test_site_info_data),
+                status=200,
+                content_type="application/json",
+            )
+            yield rsps_success

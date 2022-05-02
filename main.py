@@ -5,7 +5,10 @@ from datetime import datetime
 import click
 import requests
 from dotenv import load_dotenv
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
+# load_dotenv(".env_real")
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
@@ -14,15 +17,31 @@ headers = {
     "x-api-key": os.getenv("API_KEY"),
 }
 
+retry_strategy = Retry(
+    total=3,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["HEAD", "GET", "OPTIONS"],
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
+
 
 def get_outage_data():
-    response = requests.get(url=f"{BASE_URL}/outages", headers=headers)
-    return response.json()
+    response = http.get(url=f"{BASE_URL}/outages", headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(response.status_code)
 
 
 def get_site_info_data(site_id):
-    response = requests.get(f"{BASE_URL}/site-info/{site_id}", headers=headers)
-    return response.json()
+    response = http.get(f"{BASE_URL}/site-info/{site_id}", headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(response.status_code)
 
 
 def get_unique_site_devices(site_data):
@@ -66,27 +85,53 @@ def post_data(payload, site_id):
     response = requests.post(
         f"{BASE_URL}/site-outages/{site_id}", headers=headers, data=json.dumps(payload)
     )
-    print(response)
-    return response.json()
+    if response.status_code != 200:
+        raise Exception(response.status_code)
 
 
 @click.command()
-@click.option("--site_id", prompt="What site id are you searching for?")
+@click.option(
+    "--site_id",
+    prompt="What site id are you searching for?",
+    default="norwich-pear-tree",
+)
 def run(site_id):
-    pass
-    click.echo("Getting outage data")
-    outage_data = get_outage_data()
-    print(f"outage_data: {outage_data}")
-    click.echo(f"Getting site data for '{site_id}'")
-    site_data = get_site_info_data(site_id=site_id)
-    print(f"site_data: {site_data}")
-    click.echo(f"Getting device data for '{site_id}'")
-    device_data = get_unique_site_devices(site_data=site_data)
-    print(f"device_data: {device_data}")
+    try:
+        click.echo("Getting outage data...")
+        outage_data = get_outage_data()
+    except Exception as e:
+        print(f"Error with external API: {e}")
+        return None
+    try:
+        click.echo(f"Getting site data for '{site_id}'...")
+        site_data = get_site_info_data(site_id=site_id)
+    except Exception as e:
+        print(f"Error with external API: {e}")
+        return None
 
-    payload_data = generate_post_data(outage_data=outage_data, device_data=device_data)
+    try:
+        click.echo(f"Getting device data for '{site_id}'...")
+        device_data = get_unique_site_devices(site_data=site_data)
+    except Exception as e:
+        print(f"Error getting unique device details: {e}")
+        return None
 
-    post_data(payload=payload_data, site_id=site_id)
+    try:
+        click.echo("Generating post payload...")
+        payload_data = generate_post_data(
+            outage_data=outage_data, device_data=device_data
+        )
+    except Exception as e:
+        print(f"Error generating payload: {e}")
+        return None
+
+    try:
+        click.echo("Posting data...")
+        post_data(payload=payload_data, site_id=site_id)
+        click.echo("Successfully posted outage data")
+    except Exception as e:
+        print(f"Error with external API: {e}")
+        return None
 
 
 if __name__ == "__main__":
