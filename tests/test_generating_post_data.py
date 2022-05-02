@@ -1,6 +1,6 @@
 import json
 
-from app import generate_post_data
+from main import generate_post_data
 
 with open("data/outages.json") as f:
     test_outages_data = json.loads(f.read())

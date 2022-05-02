@@ -1,6 +1,6 @@
 import json
 
-from app import post_data
+from main import post_data
 
 with open("data/post_data.json") as f:
     test_payload = json.loads(f.read())

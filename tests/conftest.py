@@ -42,6 +42,7 @@ def mock_outages_endpoint():
         )
         yield rsps_success
 
+
 @pytest.fixture()
 def mock_outages_endpoint_post():
     with responses.RequestsMock() as rsps_success:

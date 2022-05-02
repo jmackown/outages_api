@@ -1,6 +1,6 @@
 import json
 
-from app import get_outage_data, get_site_info_data
+from main import get_outage_data, get_site_info_data
 
 with open("data/outages.json") as f:
     test_outages_data = json.loads(f.read())
@@ -14,6 +14,7 @@ test_devices = {
 }
 
 test_site_id = "kingfisher"
+
 
 def test_get_outage_data(mock_outages_endpoint):
     result = get_outage_data()

@@ -1,10 +1,10 @@
 import json
 
-from app import get_unique_site_devices
-
+from main import get_unique_site_devices
 
 with open("data/site-info.json") as f:
     test_site_info_data = json.loads(f.read())
+
 
 def test_site_devices():
     expected_result = {
@@ -13,4 +13,4 @@ def test_site_devices():
     }
     result = get_unique_site_devices(site_data=test_site_info_data)
 
-    assert result ==expected_result
+    assert result == expected_result

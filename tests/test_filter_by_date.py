@@ -1,12 +1,12 @@
 import json
 
-from app import filter_outages_by_date
+from main import filter_outages_by_date
 
 with open("data/outages.json") as f:
     test_outages_data = json.loads(f.read())
 
-def test_filter_by_date():
 
+def test_filter_by_date():
 
     expected_result = [
         {
