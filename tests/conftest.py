@@ -1,7 +1,14 @@
 import json
+import os
 
 import pytest
 import responses
+
+
+@pytest.fixture()
+def test_env(monkeypatch):
+    monkeypatch.setenv("BASE_URL", "http://example.com")
+    monkeypatch.setenv("API_KEY", "testing_key")
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +42,7 @@ def mock_outages_endpoint():
     with responses.RequestsMock() as rsps_success:
         rsps_success.add(
             responses.GET,
-            "http://example.com/outages",
+            f"{os.getenv('BASE_URL')}/outages",
             body=json.dumps(test_outages_data),
             status=200,
             content_type="application/json",
@@ -48,7 +55,7 @@ def mock_outages_endpoint_post():
     with responses.RequestsMock() as rsps_success:
         rsps_success.add(
             responses.POST,
-            "http://example.com/outages",
+            f"{os.getenv('BASE_URL')}/site-outages/{test_site_id}",
             body=json.dumps({}),
             status=200,
             content_type="application/json",
@@ -61,7 +68,7 @@ def mock_site_info_endpoint():
     with responses.RequestsMock() as rsps_success:
         rsps_success.add(
             responses.GET,
-            f"http://example.com/site-info/{test_site_id}",
+            f"{os.getenv('BASE_URL')}/site-info/{test_site_id}",
             body=json.dumps(test_site_info_data),
             status=200,
             content_type="application/json",
