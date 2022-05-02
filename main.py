@@ -8,8 +8,10 @@ from dotenv import load_dotenv
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-# load_dotenv(".env_real")
-load_dotenv()
+if os.getenv("ENV", "mock") == "live":
+    load_dotenv(".env")
+else:
+    load_dotenv(".env_mock")
 
 BASE_URL = os.getenv("BASE_URL")
 headers = {
@@ -18,17 +20,17 @@ headers = {
 }
 
 retry_strategy = Retry(
-    total=3,
+    total=5,
     status_forcelist=[429, 500, 502, 503, 504],
     allowed_methods=["HEAD", "GET", "OPTIONS"],
+    backoff_factor=2,
 )
 adapter = HTTPAdapter(max_retries=retry_strategy)
-http = requests.Session()
-http.mount("https://", adapter)
-http.mount("http://", adapter)
 
 
 def get_outage_data():
+    http = requests.Session()
+    http.mount("https://", adapter)
     response = http.get(url=f"{BASE_URL}/outages", headers=headers)
     if response.status_code == 200:
         return response.json()
@@ -37,6 +39,8 @@ def get_outage_data():
 
 
 def get_site_info_data(site_id):
+    http = requests.Session()
+    http.mount("https://", adapter)
     response = http.get(f"{BASE_URL}/site-info/{site_id}", headers=headers)
     if response.status_code == 200:
         return response.json()
@@ -85,6 +89,7 @@ def post_data(payload, site_id):
     response = requests.post(
         f"{BASE_URL}/site-outages/{site_id}", headers=headers, data=json.dumps(payload)
     )
+
     if response.status_code != 200:
         raise Exception(response.status_code)
 
