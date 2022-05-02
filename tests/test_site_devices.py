@@ -1,8 +1,9 @@
 import json
 
 from main import get_unique_site_devices
+from tests.conftest import data_dir_path
 
-with open("data/site-info.json") as f:
+with open(f"{data_dir_path}/site-info.json") as f:
     test_site_info_data = json.loads(f.read())
 
 

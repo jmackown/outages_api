@@ -3,8 +3,9 @@ import json
 import pytest
 
 from main import post_data
+from tests.conftest import data_dir_path
 
-with open("data/post_data.json") as f:
+with open(f"{data_dir_path}/post_data.json") as f:
     test_payload = json.loads(f.read())
 
 test_site_id = "kingfisher"

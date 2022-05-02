@@ -23,10 +23,13 @@ def no_http_requests(monkeypatch):
     )
 
 
-with open("data/outages.json") as f:
+data_dir_path = f"{os.path.dirname(os.path.realpath(__file__))}/data"
+
+
+with open(f"{data_dir_path}/outages.json") as f:
     test_outages_data = json.loads(f.read())
 
-with open("data/site-info.json") as f:
+with open(f"{data_dir_path}/site-info.json") as f:
     test_site_info_data = json.loads(f.read())
 
 test_devices = {

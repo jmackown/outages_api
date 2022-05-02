@@ -1,8 +1,9 @@
 import json
 
 from main import combine_outages_and_site_devices
+from tests.conftest import data_dir_path
 
-with open("data/outages.json") as f:
+with open(f"{data_dir_path}/outages.json") as f:
     test_outages_data = json.loads(f.read())
 
 test_devices = {

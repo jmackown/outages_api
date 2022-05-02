@@ -3,11 +3,12 @@ import json
 import pytest
 
 from main import get_outage_data, get_site_info_data
+from tests.conftest import data_dir_path
 
-with open("data/outages.json") as f:
+with open(f"{data_dir_path}/outages.json") as f:
     test_outages_data = json.loads(f.read())
 
-with open("data/site-info.json") as f:
+with open(f"{data_dir_path}/site-info.json") as f:
     test_site_info_data = json.loads(f.read())
 
 test_devices = {

@@ -1,11 +1,12 @@
 import json
 
 from main import generate_post_data
+from tests.conftest import data_dir_path
 
-with open("data/outages.json") as f:
+with open(f"{data_dir_path}/outages.json") as f:
     test_outages_data = json.loads(f.read())
 
-with open("data/site-info.json") as f:
+with open(f"{data_dir_path}/site-info.json") as f:
     test_site_info_data = json.loads(f.read())
 
 test_devices = {
@@ -17,7 +18,7 @@ test_site_id = "kingfisher"
 
 
 def test_generating_post_data(monkeypatch):
-    with open("data/post_data.json") as f:
+    with open(f"{data_dir_path}/post_data.json") as f:
         expected_result = json.loads(f.read())
 
     result = generate_post_data(outage_data=test_outages_data, device_data=test_devices)
